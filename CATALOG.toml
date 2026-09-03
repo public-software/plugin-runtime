@@ -22,3 +22,13 @@ summary     = "WASM Component Model host, capability policy, plugin test-kit, pl
 # specs     = []
 # provides  = ["public:area/iface@1"]
 # requires  = []
+
+[[component]]
+crate     = "pub-plugin-runtime-policy"
+kind      = "lib"
+ledger    = "plugin-runtime"
+readiness = "seed"
+effort    = 3
+specs     = ["component-model-wit"]
+provides  = []
+requires  = []
