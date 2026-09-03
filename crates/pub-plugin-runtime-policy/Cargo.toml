@@ -1,0 +1,14 @@
+[package]
+name = "pub-plugin-runtime-policy"
+description = "The capability policy a plugin host enforces: what a manifest requests, what a host grants, deny by default, a decision with reasons"
+readme = "README.md"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+
+[lints]
+workspace = true

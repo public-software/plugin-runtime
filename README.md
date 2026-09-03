@@ -13,16 +13,43 @@ Planned components: pub-plugin-host · pub-plugin-sdk · pub-plugin-testkit · p
 
 ## In 30 seconds
 
-_A runnable example goes here the day the first crate lands._
+```rust
+use pub_plugin_runtime_policy::{Label, Manifest, Policy};
+
+let mut manifest = Manifest::new(Label::new("word-count")?);
+manifest.request("directory read /documents".parse()?).request("network api.example.org:443".parse()?);
+let mut policy = Policy::new(); // grants nothing until told
+policy.grant("directory read-write /".parse()?);
+
+let evaluation = policy.evaluate(&manifest);
+assert_eq!(evaluation.granted().count(), 1); // the directory, as requested
+assert_eq!(evaluation.denied().count(), 1); // the network address: not granted
+```
 
 ## What it does
 
+- `pub-plugin-runtime-policy`: the capability policy the host will enforce. Four kinds of capability,
+  the ones a Component Model host configures: an interface to link (`public:*` and `wasi:*` alike, named
+  the Component Model way), a directory to preopen with read or read-write access, an environment
+  variable (or a prefix of them), a network host (or a suffix of them) and port. A manifest requests, a
+  policy grants, a grant may be wider than a request; a capability is allowed only when it was requested
+  and a grant covers it, and every denial says why (not requested, not granted, an incompatible version
+  naming the grant, a narrower access naming the grant). Empty policies deny everything. One text line
+  per capability, round-tripping (ADR-0001). No dependency, no `unsafe_code`.
+
 ## What it does not do (yet)
+
+- Read a manifest file or a policy file: the plugin ABI specification in `specs` fixes the manifest
+  format; the text form here is one line per capability.
+- Instantiate anything: the host on Wasmtime (linking the granted interfaces, preopening the granted
+  directories, the socket address check) is the next crate.
+- Budget memory or time, or write a `deny` line into a policy: later, with the shape noted in ADR-0001.
 
 ## Status
 
 | Ledger entry | Readiness | Next |
 |---|---|---|
+| plugin-runtime (`pub-plugin-runtime-policy`) | seed: the capability model, subsumption per kind, the decision with reasons | the Wasmtime host that enforces it; the manifest format from the plugin ABI specification |
 
 ## How it fits the suite
 
